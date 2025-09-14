@@ -1,19 +1,54 @@
-{ lib, stdenv, fetchurl, dpkg, autoPatchelfHook, makeWrapper, glib, gtk3, cairo
-, pango, gdk-pixbuf, atk, webkitgtk_4_1, libsoup_3, openssl, curl, systemd
-, iptables, iproute2, xorg, alsa-lib, nss, nspr, at-spi2-atk, cups, dbus, expat
-, fontconfig, freetype, zlib, unzip, libayatana-appindicator, coreutils }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  dpkg,
+  autoPatchelfHook,
+  makeWrapper,
+  glib,
+  gtk3,
+  cairo,
+  pango,
+  gdk-pixbuf,
+  atk,
+  webkitgtk_4_1,
+  libsoup_3,
+  openssl,
+  curl,
+  systemd,
+  iptables,
+  iproute2,
+  xorg,
+  alsa-lib,
+  nss,
+  nspr,
+  at-spi2-atk,
+  cups,
+  dbus,
+  expat,
+  fontconfig,
+  freetype,
+  zlib,
+  unzip,
+  libayatana-appindicator,
+  coreutils,
+}:
 
 stdenv.mkDerivation rec {
   pname = "portmaster";
   version = "2.0.25";
 
   src = fetchurl {
-    url =
-      "https://updates.safing.io/latest/linux_amd64/packages/Portmaster_${version}_amd64.deb";
+    url = "https://updates.safing.io/latest/linux_amd64/packages/Portmaster_${version}_amd64.deb";
     sha256 = "sha256-BD4DAN0ymGGvCuqgt2Aiq+H9lplqzdeB56AtOSV/2lw="; # We'll need to update this hash
   };
 
-  nativeBuildInputs = [ dpkg autoPatchelfHook makeWrapper unzip ];
+  nativeBuildInputs = [
+    dpkg
+    autoPatchelfHook
+    makeWrapper
+    unzip
+  ];
 
   buildInputs = [
     glib
@@ -106,7 +141,12 @@ stdenv.mkDerivation rec {
         echo "Wrapping binary: $binary"
         wrapProgram "$binary" \
           --prefix PATH : ${
-            lib.makeBinPath [ systemd iptables iproute2 coreutils ]
+            lib.makeBinPath [
+              systemd
+              iptables
+              iproute2
+              coreutils
+            ]
           } \
           --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath buildInputs} \
           --set-default GDK_BACKEND "wayland,x11" \

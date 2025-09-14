@@ -1,8 +1,14 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.portmaster;
-in {
+in
+{
   options.services.portmaster = with lib; {
     enable = mkEnableOption "Portmaster application firewall";
 
@@ -48,10 +54,23 @@ in {
 
     systemd.services.portmaster = {
       description = "Portmaster by Safing";
-      documentation = [ "https://safing.io" "https://docs.safing.io" ];
-      before = [ "nss-lookup.target" "network.target" "shutdown.target" ];
-      after = [ "systemd-networkd.service" "systemd-tmpfiles-setup.service" ];
-      conflicts = [ "shutdown.target" "firewalld.service" ];
+      documentation = [
+        "https://safing.io"
+        "https://docs.safing.io"
+      ];
+      before = [
+        "nss-lookup.target"
+        "network.target"
+        "shutdown.target"
+      ];
+      after = [
+        "systemd-networkd.service"
+        "systemd-tmpfiles-setup.service"
+      ];
+      conflicts = [
+        "shutdown.target"
+        "firewalld.service"
+      ];
       wants = [ "nss-lookup.target" ];
       wantedBy = [ "multi-user.target" ];
       requires = [ "systemd-tmpfiles-setup.service" ];
@@ -76,14 +95,16 @@ in {
         fi
       '';
 
-      script = let
-        baseArgs = [
-          "/usr/lib/portmaster/portmaster-core"
-          "--log-dir=/var/lib/portmaster/logs"
-        ];
-        devmodeArgs = lib.optional cfg.devmode.enable "--devmode";
-        allArgs = baseArgs ++ devmodeArgs ++ [ "--" ] ++ cfg.extraArgs;
-      in lib.concatStringsSep " " allArgs;
+      script =
+        let
+          baseArgs = [
+            "/usr/lib/portmaster/portmaster-core"
+            "--log-dir=/var/lib/portmaster/logs"
+          ];
+          devmodeArgs = lib.optional cfg.devmode.enable "--devmode";
+          allArgs = baseArgs ++ devmodeArgs ++ [ "--" ] ++ cfg.extraArgs;
+        in
+        lib.concatStringsSep " " allArgs;
 
       postStop = ''
         /usr/lib/portmaster/portmaster-core recover-iptables || echo "Iptables cleanup completed"
@@ -105,7 +126,10 @@ in {
         StateDirectory = "portmaster";
         WorkingDirectory = "/var/lib/portmaster";
         ProtectSystem = true;
-        ReadWritePaths = [ "/usr/lib/portmaster" "/var/lib/portmaster" ];
+        ReadWritePaths = [
+          "/usr/lib/portmaster"
+          "/var/lib/portmaster"
+        ];
         ProtectHome = "read-only";
         ProtectKernelTunables = true;
         ProtectKernelLogs = true;
@@ -144,9 +168,16 @@ in {
           "cap_bpf"
           "cap_perfmon"
         ];
-        RestrictAddressFamilies =
-          [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
-        Environment = [ "LOGLEVEL=info" "PORTMASTER_ARGS=" ];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_NETLINK"
+          "AF_INET"
+          "AF_INET6"
+        ];
+        Environment = [
+          "LOGLEVEL=info"
+          "PORTMASTER_ARGS="
+        ];
         EnvironmentFile = [ "-/etc/default/portmaster" ];
       };
     };

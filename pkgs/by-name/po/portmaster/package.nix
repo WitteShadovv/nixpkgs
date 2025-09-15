@@ -34,7 +34,7 @@
   coreutils,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "portmaster";
   version = "2.0.25";
 
@@ -168,4 +168,4 @@ stdenv.mkDerivation rec {
     maintainers = with maintainers; [ WitteShadovv ];
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
   };
-}
+})
